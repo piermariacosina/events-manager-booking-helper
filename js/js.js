@@ -1,4 +1,4 @@
-var jq = jQuery, amt = 0, sliders_num = 3, max = 100, sliders = get_sliders(), sliders_num = sliders.length;
+var jq = jQuery, amt = 0, sliders_num = 3, max = 100, sliders = get_sliders(), sliders_num = sliders.length, timeout, time = 0;
 
 jq(function(){
 	nonna_distibutePaymentInit( jq('#em-booking-form') );
@@ -8,7 +8,7 @@ function nonna_distibutePaymentInit( cont )
 {	
 	if( jq('input[name="donate"]').is('input') )
 	{
-		var container = cont, distibute_container = jq('<div id="distibute-credit-container" class="booking-box">'), amount_input = jq('input[name="donate"]'), mcm = mmc(defaults.split_arr);
+		var container = cont, distibute_container = jq('<div id="distibute-credit-container" class="booking-box">'), amount_input = jq('input[name="donate"]');
 		
 		container.append( distibute_container );
 		
@@ -26,24 +26,7 @@ function nonna_distibutePaymentInit( cont )
 				},
 				slide: function(event, ui) 
 				{ 
-					var partial = max - ui.value, me = jq(this), me_name = me.attr('id').split('_')[1];
-					
-					console.log("mcm:: "+mcm+"\n");
-					
-					for(var i=0; i<sliders_num; i++)
-					{
-						if( me.attr('id') !== sliders[i].attr('id') ) 
-						{
-							var sliders_name = sliders[i].attr('id').split('_')[1], mult, maj;
-							
-							mult = partial / sliders[i].slider('value');
-							
-							maj = ( sliders[i].slider('value') * mult ) - defaults.split[sliders_name];
-							
-							//console.log( 'slide '+sliders[i].attr('id')+' val '+sliders[i].slider('value')+' mult '+mult +" maj "+maj+"\n");
-							sliders[i].slider("value", maj );
-						}
-					}		
+					return slideslide(event,ui,i);
 				}
 			});
 		});
@@ -53,14 +36,34 @@ function nonna_distibutePaymentInit( cont )
 		});
 	} 
 };
-
+function moveothersliders(index,val) {
+  var sum = 0;
+  for (var i = 0; i<sliders_num; i++) {
+    if (i == index) continue;
+    sum += sliders[i].slider('value');
+  }
+  var mult = (max - (val ? val : sliders[index].slider('value'))) / sum;
+  for (var i = 0; i<sliders_num; i++) {
+    if (i == index) continue;
+    sliders[i].slider('value',sliders[i].slider('value') * mult);
+  }
+};
+var slideslide = function(e,ui,index) {
+  
+  if (time + 20 > e.timeStamp) return;
+  clearTimeout(timeout);
+  timeout = setTimeout(function() {
+    moveothersliders(index);
+  },20);
+  time = e.timeStamp;
+  moveothersliders(index,ui.value);
+};
 var defaults = {
 	'split' : {
-		'dev' : 70,
-		'cook' : 20,
-		'charity' : 10
-	},
-	'split_arr' : [70, 20, 10]
+		'dev' : 50,
+		'cook' : 35,
+		'charity' : 15
+	}
 };
 
 function get_sliders()
@@ -81,17 +84,4 @@ function cleanamount(a) {
   a = a.replace(',','');
   a = parseFloat(a);
   return a;
-};
-var mmc = function(o){
-    for(var i, j, n, d, r = 1; (n = o.pop()) != undefined;)
-        while(n > 1){
-            if(n % 2){
-                for (i = 3, j = Math.floor(Math.sqrt(n)); i <= j && n % i; i += 2);
-                d = i <= j ? i : n;
-            }
-            else
-                d = 2;
-            for(n /= d, r *= d, i = o.length; i; !(o[--i] % d) && (o[i] /= d) == 1 && o.splice(i, 1));
-        }
-    return r;
 };
