@@ -60,9 +60,9 @@ var slideslide = function(e,ui,index) {
 };
 var defaults = {
 	'split' : {
-		'dev' : 50,
-		'cook' : 35,
-		'charity' : 15
+		'dev' : 70,
+		'cook' : 20,
+		'charity' : 10
 	}
 };
 
