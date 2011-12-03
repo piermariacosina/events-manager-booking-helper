@@ -8,7 +8,7 @@ function nonna_distibutePaymentInit( cont )
 {	
 	if( jq('input[name="donate"]').is('input') )
 	{
-		var container = cont, distibute_container = jq('<div id="distibute-credit-container" class="booking-box">'), amount_input = jq('input[name="donate"]'), init_vals = defaults.split_arr;
+		var container = cont, distibute_container = jq('<div id="distibute-credit-container" class="booking-box">'), amount_input = jq('input[name="donate"]'), mcm = mmc(defaults.split_arr);
 		
 		container.append( distibute_container );
 		
@@ -28,7 +28,7 @@ function nonna_distibutePaymentInit( cont )
 				{ 
 					var partial = max - ui.value, me = jq(this), me_name = me.attr('id').split('_')[1];
 					
-					console.log("mcm:: "+mmc(init_vals)+"\n");
+					console.log("mcm:: "+mcm+"\n");
 					
 					for(var i=0; i<sliders_num; i++)
 					{
