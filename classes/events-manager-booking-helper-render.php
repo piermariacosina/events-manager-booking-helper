@@ -13,7 +13,7 @@ class BookingHelperRender
 		if( $page->post_name == 'events-eventi' )
 		{
 			wp_enqueue_style( 'events-manager-booking-helper', BOOKING_HELPER_URL.'css/css.css', '', '0.1' );
-			wp_enqueue_script( 'events-manager-booking-helper', BOOKING_HELPER_URL.'js/js.js', array('jquery'), '0.1', false);
+			wp_enqueue_script( 'events-manager-booking-helper', BOOKING_HELPER_URL.'js/js.js', array('jquery'), '0.1', true);
 		}
 	}
 }
