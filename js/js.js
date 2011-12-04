@@ -23,6 +23,7 @@ function nonna_distibutePaymentInit( cont )
 	{
 		var container = cont, distibute_container = jq('<div id="distibute-credit-container" class="booking-box">'), amount_input = jq('input[name="donate"]'), display_prices = new Array(), append = jq('.em-booking-buttons');
 		
+		
 		jq('div.em-booking-buttons').before( distibute_container );
 		
 		jq.each(sliders, function(i){
@@ -30,7 +31,7 @@ function nonna_distibutePaymentInit( cont )
 			
 			display_prices[i] = jq('<div class="display-splits" id="split_'+name+'">');
 			
-			display_prices[i].text(0);
+			display_prices[i].text('0.00');
 			
 			distibute_container.append( jq(this) );
 			
