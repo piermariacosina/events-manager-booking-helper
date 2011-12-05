@@ -11,7 +11,7 @@ class BookingHelperRender
 		
 		$page = $wp_query->get_queried_object();
 		
-		if( $page->post_type == 'event' )
+		if( $page->post_type == 'event' && !is_admin() )
 		{
 			wp_deregister_script( 'ui-core' );
 			wp_deregister_script( 'ui-widget' );

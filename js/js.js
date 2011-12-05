@@ -16,7 +16,6 @@ function Defaults(){
 		'charity' : 0
 	}
 };
-
 function nonna_distibutePaymentInit( cont )
 {	
 	if( jq('input[name="donate"]').is('input') )
@@ -59,16 +58,25 @@ function nonna_distibutePaymentInit( cont )
 			});
 		});
 		
-		amount_input.blur(function(e){
-			amt = cleanamount( jq(this).val() );
-			
-			if( validamount( amt ) )
+		amount_input.keyup(function(e){
+			var val = isNaN( jq(this).val() ) ? false : jq(this).val() ;
+
+			if(val)
 			{
-				updatePrices( display_prices );
+				amt = cleanamount( jq(this).val() );
+
+				if( validamount( amt ) )
+				{
+					updatePrices( display_prices );
+				}
+				else
+				{
+					globalMessages('Please check the format of the donation you made.');
+				}
 			}
 			else
 			{
-				alert('Please che the format of the donation you made.');
+				globalMessages('Only numbers are allowed in this field!');
 			}
 		});
 	} 
@@ -131,4 +139,9 @@ function prettymoney(c) {
   c.push('00');
   if (c[1].length == 1) c[1] += '0';
   return c[0] + '.' + c[1];
+};
+String.prototype.isInteger = function()
+{
+	var reInteger = /^\d+$/;
+	return reInteger.test(this);
 };
