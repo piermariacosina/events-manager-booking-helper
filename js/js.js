@@ -49,6 +49,7 @@ function nonna_distibutePaymentInit( cont )
 				slide: function(event, ui) 
 				{ 
 					slideslide(event,ui,i);
+					if( amt == 0 ) return;
 					return updatePrices( display_prices );
 				},
 				stop: function(event, ui)
@@ -59,8 +60,16 @@ function nonna_distibutePaymentInit( cont )
 		});
 		
 		amount_input.blur(function(e){
-			amt = jq(this).val();
-			updatePrices( display_prices );
+			amt = cleanamount( jq(this).val() );
+			
+			if( validamount( amt ) )
+			{
+				updatePrices( display_prices );
+			}
+			else
+			{
+				alert('Please che the format of the donation you made.');
+			}
 		});
 	} 
 };
@@ -79,10 +88,10 @@ function moveothersliders(index,val) {
     if (i == index) continue;
     sum += sliders[i].slider('value');
   }
-  var mult = (max - (val ? val : sliders[index].slider('value'))) / sum, name, val;
+  var mult = (max - (val ? val : sliders[index].slider('value'))) / sum, /*name,*/ val;
   for (var i = 0; i<sliders_num; i++) {
     if (i == index) continue;
-	name = sliders[i].attr('id').split('_')[1];
+//	name = sliders[i].attr('id').split('_')[1];
 	val = sliders[i].slider('value') * mult;
     sliders[i].slider('value',val);
   }
