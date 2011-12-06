@@ -1,4 +1,4 @@
-var jq = jQuery, amt = 0, sliders_num = 3, max = 100, sliders = get_sliders(), sliders_num = sliders.length, timeout, time = 0, defaults = new Defaults();
+var jq = jQuery, contribution = 0, sliders_num = 3, max = 2500, sliders = get_sliders(), sliders_num = sliders.length, timeout, time = 0, defaults = new Defaults(), timeout = -100, display_prices = new Array(), hiddens = new Array();
 
 jq(function(){
 	if( jq('input[name="donate"]').is('input') ){
@@ -17,22 +17,22 @@ jq(function(){
 function Defaults()
 {
 	this.split = {
-		'dev' : 70,
-		'cook' : 20,
-		'charity' : 10
+		'dev' : 0.70000000000000004,
+		'cook' : 0.2000000000000004,
+		'charity' : 0.10000000000004
 	}
 };
 function nonna_distibutePaymentInit( cont )
 {	
 	if( jq('input[name="donate"]').is('input') )
 	{
-		var container = cont, distibute_container = jq('<div id="distibute-credit-container" class="booking-box">'), amount_input = jq('input[name="donate"]'), display_prices = new Array(), append = jq('.em-booking-buttons'), hiddens = new Array();
+		var container = cont, distibute_container = jq('<div id="distibute-credit-container" class="booking-box">'), amount_input = jq('input[name="donate"]'), append = jq('.em-booking-buttons'), index;
 		
 		
 		jq('div.em-booking-buttons').before( distibute_container );
 		
 		jq.each(sliders, function(i){
-			var name = jq(this).attr('id').split('_')[1];
+			var name = jq(this).attr('id').split('_')[1], delta;
 			
 			display_prices[i] = jq('<div class="display-splits" id="split_'+name+'">');
 			
@@ -49,21 +49,24 @@ function nonna_distibutePaymentInit( cont )
 			jq( this ).slider({
 				min:1,
 				max: max,
-				value: defaults.split[name],
+				value: max * defaults.split[name],
 				step: 1,
+				create: function(event, ui)
+				{
+					
+				},
 				start: function( event, ui )
 				{
-					///
+					index = i;
 				},
 				slide: function(event, ui) 
 				{ 
-					slideslide(event,ui,i);
-					if( amt == 0 ) 
+					if( contribution == 0 ) 
 					{
 						globalMessages('You should fill a donation amount to split it!');
 						return false;
 					}
-					return updatePrices( display_prices, hiddens, i );
+					return slideslide(event,ui,i);
 				},
 				stop: function(event, ui)
 				{
@@ -78,11 +81,11 @@ function nonna_distibutePaymentInit( cont )
 
 			if(val)
 			{
-				amt = cleanamount( jq(this).val() );
+				contribution = cleanamount( jq(this).val() );
 
-				if( validamount( amt ) )
+				if( validamount( contribution ) )
 				{
-					updatePrices( display_prices, hiddens );
+					updatesliders( index );
 				}
 				else
 				{
@@ -96,28 +99,54 @@ function nonna_distibutePaymentInit( cont )
 		});
 	} 
 };
-function updatePrices( elements, hiddens, index )
-{
-	var els = elements, pos = ( index ) ? index : 0;
+function updatesliders( index ) {
+  var total = 0, amt = 0, display = 0;
+  
+  for (var i = 0; i<sliders_num; i++) 
+  {
+    var v = sliders[i].slider('value');
+    if (v < 10) v = 0;
+    total += v;
+  }
+  for (var i = 0; i<sliders_num; i++) 
+  {
+    var v = sliders[i].slider('value'), p = v / total, d = Math.floor(1000000 * p) / 10000, da = Math.floor(contribution * p * 100);
+	if (v < 10) v = 0;
+	sliders[i].discreteamount = da;
+    sliders[i].difference = (p * contribution * 100) - da;
+  }
+  sum = 0;
+  for (var i = 0; i<sliders_num; i++) 
+  {
+    sum += sliders[i].discreteamount;
+  }
+
+  difference = Math.round(contribution * 100 - sum);
 	
-	jq.each(els, function(i){
-		var /*name = els[i].attr('id').split('_')[1],*/ rate = sliders[i].slider('value'), round = 0;
-		money = ( amt / 100 ) * rate;
-		round = money.roundNumber(2);
-		if( round < 1 )
-		{
-			round = 0;
-		}
-		if( ( max -sliders[index].slider('value') ) < 1 )
-		{
-			round = parseInt( round );
-		}
-		elements[i].text( round );
-		hiddens[i].val( round );
-	});
+	for (var i = difference; i >= 1; i -= 1) {
+	    var md = mostdifferent();
+	    md.difference -= 1;
+	    md.discreteamount += 1;
+	  }
+
+  for (var i = 0; i<sliders_num; i++) 
+  {
+	amt = ( sliders[i].discreteamount + 0.006666666666667 ) / 100, display = parseFloat( amt.toFixed(2) );
+	 
+	display_prices[i].text( moneyfmt(prettymoney( display )));
+	hiddens[i].val( prettymoney( display ) );
+  }
+};
+var mostdifferent = function() {
+  var largest;
+  for (var i = 0; i<sliders_num; i++) {
+    if (!largest || sliders[i].difference > largest.difference)
+      largest = sliders[i];
+  }
+  return largest;
 };
 function moveothersliders(index,val) {
-  var sum = 0;
+  var sum = 0, difference;
   for (var i = 0; i<sliders_num; i++) {
     if (i == index) continue;
     sum += sliders[i].slider('value');
@@ -129,9 +158,10 @@ function moveothersliders(index,val) {
 	val = sliders[i].slider('value') * mult;
     sliders[i].slider('value',val);
   }
+	updatesliders( index )
 };
-var slideslide = function(e,ui,index) {
-  
+var slideslide = function(e,ui,index) 
+{
   if (time + 20 > e.timeStamp) return;
   clearTimeout(timeout);
   timeout = setTimeout(function() {
@@ -145,7 +175,8 @@ function get_sliders()
 	var sliders = new Array( jq('<div id="slider_dev" class="sliders">'), jq('<div id="slider_cook" class="sliders">'), jq('<div id="slider_charity" class="sliders">') );
 	return sliders;
 };
-function validamount(a) {
+function validamount(a) 
+{
   if (typeof(a) == 'number') return true;
   a = a.replace('$','');
   return /^\d+\.$/.test(a) || /^\d+$/.test(a) || /^\d*\.\d+$/.test(a) || /^\d*\.\d+$/.test(a) || /^(\d,|\d\d,)?(\d\d\d,)*\d\d\d(\.\d+)?$/.test(a)
@@ -157,4 +188,22 @@ function cleanamount(a) {
   a = a.replace(',','');
   a = parseFloat(a);
   return a;
+};
+/*
+ * JavaScript currency formatting
+ * (from http://stackoverflow.com/questions/149055/how-can-i-format-numbers-as-money-in-javascript/149099#149099)
+ */
+var formatMoney = function(n,c,d,t,z) {
+  z = z ? z : '';  c = isNaN(c = Math.abs(c)) ? 2 : c, d = d == undefined ? ',' : d, t = t == undefined ? '.' : t, s = n < 0 ? '-' : '', i = parseInt(n = Math.abs(+n || 0).toFixed(c)) + '', j = (j = i.length) > 3 ? j % 3 : 0;
+    return z + s + (j ? i.substr(0, j) + t : '') + i.substr(j).replace(/(\d{3})(?=\d)/g, '$1' + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : '');
+};
+var moneyfmt = function(a) {
+  return formatMoney(a,2,'.',',','€');
+};
+function prettymoney(c) {
+  c = '' + c;
+  c = c.split('.');
+  c.push('00');
+  if (c[1].length == 1) c[1] += '0';
+  return c[0] + '.' + c[1];
 };
