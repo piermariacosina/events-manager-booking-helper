@@ -4,6 +4,7 @@ class BookingHelperRender
 	public function __construct()
 	{
 		add_action( 'get_header', array(&$this, 'isPageEvent') );
+	//	add_filter( 'em_event_save',array(&$this, 'saveAmounts'), 1, 2 );
 	}
 	public function isPageEvent()
 	{
@@ -19,6 +20,13 @@ class BookingHelperRender
 			wp_enqueue_script( 'events-manager-booking-helper-ui-custom', BOOKING_HELPER_URL.'js/jquery-ui-custom/jquery-ui-custom.min.js', array('jquery'), '0.1', false );
 			wp_enqueue_style( 'events-manager-booking-helper', BOOKING_HELPER_URL.'css/css.css', '', '0.1' );
 			wp_enqueue_script( 'events-manager-booking-helper', BOOKING_HELPER_URL.'js/js.js', array('jquery'), '0.1', false);
+		}
+	}
+	public function saveAmounts( $result, $EM_Event )
+	{
+		if( $result && $_POST && !empty( $_POST['donate'] ) )
+		{
+			print_r($_POST);
 		}
 	}
 }

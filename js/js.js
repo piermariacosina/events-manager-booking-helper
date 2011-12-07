@@ -131,7 +131,7 @@ function updatesliders( index ) {
 
   for (var i = 0; i<sliders_num; i++) 
   {
-	amt = ( sliders[i].discreteamount + 0.006666666666667 ) / 100, display = parseFloat( amt.toFixed(2) );
+	amt = ( sliders[i].discreteamount  ) / 100, display = parseFloat( amt.toFixed(2) );
 	 
 	display_prices[i].text( moneyfmt(prettymoney( display )));
 	hiddens[i].val( prettymoney( display ) );
@@ -189,6 +189,13 @@ function cleanamount(a) {
   a = parseFloat(a);
   return a;
 };
+function prettymoney(c) {
+  c = '' + c;
+  c = c.split('.');
+  c.push('00');
+  if (c[1].length == 1) c[1] += '0';
+  return c[0] + '.' + c[1];
+};
 /*
  * JavaScript currency formatting
  * (from http://stackoverflow.com/questions/149055/how-can-i-format-numbers-as-money-in-javascript/149099#149099)
@@ -199,11 +206,4 @@ var formatMoney = function(n,c,d,t,z) {
 };
 var moneyfmt = function(a) {
   return formatMoney(a,2,'.',',','€');
-};
-function prettymoney(c) {
-  c = '' + c;
-  c = c.split('.');
-  c.push('00');
-  if (c[1].length == 1) c[1] += '0';
-  return c[0] + '.' + c[1];
 };
