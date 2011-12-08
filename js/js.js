@@ -1,4 +1,4 @@
-var jq = jQuery, contribution = 0, sliders_num = 3, max = 2500, sliders = get_sliders(), sliders_num = sliders.length, timeout, time = 0, defaults = new Defaults(), timeout = -100, display_prices = new Array(), hiddens = new Array();
+var jq = jQuery, contribution = 0, sliders_num = 3, max = 2500, sliders = get_sliders(), sliders_num = sliders.length, timeout, time = 0, defaults = new Defaults(), timeout = -100, display_prices = new Array(), hiddens = new Array(), NonnaHelper;
 
 jq(function(){
 	if( jq('input[name="donate"]').is('input') ){
@@ -10,10 +10,9 @@ jq(function(){
 				jq('input[name="donate"]').val('');
 			}
 		});
+		nonna_distibutePaymentInit( jq('#em-booking-form') );
 	}
-	nonna_distibutePaymentInit( jq('#em-booking-form') );
 });
-
 function Defaults()
 {
 	this.split = {
