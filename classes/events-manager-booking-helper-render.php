@@ -5,8 +5,7 @@ class BookingHelperRender
 	{
 		add_action( 'get_header', array(&$this, 'isPageEvent') );
 		add_filter( 'em_booking_save', array(&$this, 'saveAmounts'), 1, 2 );
-		add_filter( 'em_booking_save', array(&$this, 'saveAmounts'), 1, 2 );
-		add_filter( 'em_booking_delete');
+		add_filter( 'em_booking_delete', array(&$this, 'deleteAmounts'), 10, 2 );
 	}
 	public function isPageEvent()
 	{
@@ -38,6 +37,16 @@ class BookingHelperRender
 			$wpdb->query("INSERT INTO ".EM_META_TABLE." (object_id, meta_key, meta_value) VALUES ( {$EM_Event->id}, 'split_amount_charity', {$split_amount_charity})");
 		}
 		return true;
+	}
+	public function deleteAmounts( $result, $EM_Booking  )
+	{
+		global $wpdb;
+			
+		if( $EM_Booking->can_manage('manage_bookings','manage_others_bookings') )
+		{
+			$sql = $wpdb->prepare("DELETE FROM ". EM_META_TABLE . " WHERE object_id=%d", $EM_Booking->booking_id);
+			$result = $wpdb->query( $sql );
+		}
 	}
 }
 ?>
