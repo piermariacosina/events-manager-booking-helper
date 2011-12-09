@@ -1,5 +1,6 @@
 #main-inner{margin-right:0;}
-div#distibute-credit-container{width:100%;clear:both;}
+div#distibute-credit-container{width:100%;clear:both;display:block;float:left;overflow:auto;}
 div.sliders{margin:5px 0 30px 0;width:190px;float:left;}
 div.display-splits{float:left;width:44px;height:14px;border:1px solid #c0c0c0;margin:0 0 0 20px;padding:3px;font-size:14px;font-weight:bold;color:white;background:#c0c0c0;}
 div.em-booking-buttons{height:24px;width:125px;clear:both;}
+div#info-box{clear:both;word-wrap:break-word;overflow:hidden;font:1.3em/1.2em "Neuton", Georgia, "Times New Roman", Times, serif;font-weight:200;}

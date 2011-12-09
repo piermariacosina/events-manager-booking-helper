@@ -1,4 +1,4 @@
-var jq = jQuery, contribution = 0, sliders_num = 3, max = 2500, sliders = get_sliders(), sliders_num = sliders.length, timeout, time = 0, defaults = new Defaults(), timeout = -100, display_prices = new Array(), hiddens = new Array(), NonnaHelper;
+var jq = jQuery, contribution = 0, sliders_num = 3, max = 2500, sliders = get_sliders(), sliders_num = sliders.length, timeout, time = 0, defaults = new Defaults(), timeout = -100, display_prices = new Array(), hiddens = new Array(), NonnaHelper, info_box = jq('<div id="info-box"></div>'), people, price;
 
 jq(function(){
 	if( jq('input[name="donate"]').is('input') ){
@@ -11,6 +11,7 @@ jq(function(){
 			}
 		});
 		nonna_distibutePaymentInit( jq('#em-booking-form') );
+		changeTotalsOnChangePeople();
 	}
 });
 function Defaults()
@@ -21,16 +22,31 @@ function Defaults()
 		'charity' : 0.10000000000004
 	}
 };
+function changeTotalsOnChangePeople()
+{
+	jq('.em-ticket-select').change(function(event){
+		people = jq(this).val();
+		var tt = ( ( parseFloat(price) + parseFloat(contribution) ) * people ).toFixed(2);
+		info_box.text( 'Price €'+parseFloat(price).toFixed(2)+' donation €'+parseFloat(contribution).toFixed(2)+' for ' +people+' people = '+ tt +'€'); 
+	});
+}
 function nonna_distibutePaymentInit( cont )
 {	
 	if( jq('input[name="donate"]').is('input') )
 	{
 		var container = cont, distibute_container = jq('<div id="distibute-credit-container" class="booking-box">'), amount_input = jq('input[name="donate"]'), append = jq('.em-booking-buttons'), index;
 		
+		price = cleanamount( jq('.em-booking-form-details > p > strong').text() )
+		people = jq('.em-ticket-select').val();
 		
 		jq('div.em-booking-buttons').before( distibute_container );
 		
+		jq('div.em-booking-buttons').before( info_box );
+		
+		info_box.text( 'Price €'+price.toFixed(2)+' for ' +people+' people = '+ parseFloat(price * people).toFixed(2) +'€' );
+		
 		jq.each(sliders, function(i){
+			
 			var name = jq(this).attr('id').split('_')[1], delta;
 			
 			display_prices[i] = jq('<div class="display-splits" id="split_'+name+'">');
@@ -76,30 +92,37 @@ function nonna_distibutePaymentInit( cont )
 		
 		amount_input.keyup(function(e){
 			
-			var val = isNaN( jq(this).val() ) ? false : jq(this).val() ;
-
-			if(val)
-			{
-				contribution = cleanamount( jq(this).val() );
-
-				if( validamount( contribution ) )
+			var val = isNaN( jq(this).val() ) || jq(this).val() == '' ? 0 : jq(this).val(), tt;
+			
+				if( val >= 0 )
 				{
-					updatesliders( index );
+					
+					contribution = val;
+					
+					tt = ( ( parseFloat(price) + parseFloat(contribution) ) * people ).toFixed(2);
+					
+					if( validamount( contribution ) )
+					{
+						info_box.text( 'Price €'+parseFloat(price).toFixed(2)+' donation €'+parseFloat(contribution).toFixed(2)+' for ' +people+' people = '+ tt +'€'); 
+
+						updatesliders( index );
+					}
+					else
+					{
+						if( event.keyCode != 8)
+						globalMessages('Please check the format of the donation you made.');
+					}
 				}
 				else
 				{
-					globalMessages('Please check the format of the donation you made.');
+					if( event.keyCode != 8)
+					globalMessages('Only numbers are allowed in this field!');
 				}
-			}
-			else
-			{
-				globalMessages('Only numbers are allowed in this field!');
-			}
 		});
 	} 
 };
 function updatesliders( index ) {
-  var total = 0, amt = 0, display = 0;
+  var total = 0, amt = 0;
   
   for (var i = 0; i<sliders_num; i++) 
   {
@@ -183,7 +206,7 @@ function validamount(a)
 function cleanamount(a) {
   if (typeof(a) == 'number') return a;
   a = a.replace('$','');
- // a = a.replace('€','');
+  a = a.replace('€','');
   a = a.replace(',','');
   a = parseFloat(a);
   return a;
