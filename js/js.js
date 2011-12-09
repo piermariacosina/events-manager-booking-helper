@@ -1,4 +1,4 @@
-var jq = jQuery, contribution = 0, sliders_num = 3, max = 2500, sliders = get_sliders(), sliders_num = sliders.length, timeout, time = 0, defaults = new Defaults(), timeout = -100, display_prices = new Array(), hiddens = new Array(), NonnaHelper, info_box = jq('<div id="info-box"></div>'), people, price;
+var jq = jQuery, contribution = 0, sliders_num = 3, max = 2500, sliders = get_sliders(), sliders_num = sliders.length, timeout, time = 0, defaults = new Defaults(), timeout = -100, display_prices = new Array(), hiddens = new Array(), NonnaHelper, info_box = jq('<div id="info-box"></div>'), people, price, tax = 3.5;
 
 jq(function(){
 	if( jq('input[name="donate"]').is('input') ){
@@ -25,25 +25,34 @@ function Defaults()
 function changeTotalsOnChangePeople()
 {
 	jq('.em-ticket-select').change(function(event){
+		var r;
 		people = jq(this).val();
-		var tt = ( ( parseFloat(price) + parseFloat(contribution) ) * people ).toFixed(2);
-		info_box.text( 'Price €'+parseFloat(price).toFixed(2)+' donation €'+parseFloat(contribution).toFixed(2)+' for ' +people+' people = '+ tt +'€'); 
+		var tt = ( ( parseFloat(price) + parseFloat(contribution) ) * people );
+		r = parseFloat( ( tt / 100 ) * tax );
+		tt = tt + r; 
+		
+		info_box.text( 'Price €'+parseFloat(price).toFixed(2)+' donation €'+parseFloat(contribution).toFixed(2)+' for ' +people+' people = '+ tt.toFixed(2) +'€'); 
 	});
 }
 function nonna_distibutePaymentInit( cont )
 {	
 	if( jq('input[name="donate"]').is('input') )
 	{
-		var container = cont, distibute_container = jq('<div id="distibute-credit-container" class="booking-box">'), amount_input = jq('input[name="donate"]'), append = jq('.em-booking-buttons'), index;
+		var container = cont, distibute_container = jq('<div id="distibute-credit-container" class="booking-box">'), amount_input = jq('input[name="donate"]'), append = jq('.em-booking-buttons'), index, tt;
 		
-		price = cleanamount( jq('.em-booking-form-details > p > strong').text() )
+		price = cleanamount( jq('.em-booking-form-details > p > strong').text() );
+		
 		people = jq('.em-ticket-select').val();
+		
+		tt = parseFloat( ( price * people ) );
+		
+		tt = tt + ( tt / 100 ) * tax;
 		
 		jq('div.em-booking-buttons').before( distibute_container );
 		
 		jq('div.em-booking-buttons').before( info_box );
 		
-		info_box.text( 'Price €'+price.toFixed(2)+' for ' +people+' people = '+ parseFloat(price * people).toFixed(2) +'€' );
+		info_box.text( 'Price €'+price.toFixed(2)+' for ' +people+' people = '+ tt.toFixed(2) +'€' );
 		
 		jq.each(sliders, function(i){
 			
@@ -99,11 +108,13 @@ function nonna_distibutePaymentInit( cont )
 					
 					contribution = val;
 					
-					tt = ( ( parseFloat(price) + parseFloat(contribution) ) * people ).toFixed(2);
+					tt = ( ( parseFloat(price) + parseFloat(contribution) ) * people );
+					
+					tt = tt + ( tt / 100 ) * tax;
 					
 					if( validamount( contribution ) )
 					{
-						info_box.text( 'Price €'+parseFloat(price).toFixed(2)+' donation €'+parseFloat(contribution).toFixed(2)+' for ' +people+' people = '+ tt +'€'); 
+						info_box.text( 'Price €'+parseFloat(price).toFixed(2)+' donation €'+parseFloat(contribution).toFixed(2)+' for ' +people+' people = '+ tt.toFixed(2) +'€'); 
 
 						updatesliders( index );
 					}
