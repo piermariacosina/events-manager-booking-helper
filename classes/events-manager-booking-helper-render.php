@@ -36,7 +36,7 @@ class BookingHelperRender
 			$wpdb->query("INSERT INTO ".EM_META_TABLE." (object_id, meta_key, meta_value) VALUES ( {$EM_Event->id}, 'split_amount_cook', {$split_amount_cook})");
 			$wpdb->query("INSERT INTO ".EM_META_TABLE." (object_id, meta_key, meta_value) VALUES ( {$EM_Event->id}, 'split_amount_charity', {$split_amount_charity})");
 		}
-		return true;
+		return $result;
 	}
 	public function cancelBooking( $result, $EM_Booking  )
 	{
