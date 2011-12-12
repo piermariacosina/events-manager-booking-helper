@@ -1,4 +1,4 @@
-var jq = jQuery, contribution = 0, sliders_num = 3, max = 2500, sliders = get_sliders(), sliders_num = sliders.length, timeout, time = 0, defaults = new Defaults(), timeout = -100, display_prices = new Array(), hiddens = new Array(), NonnaHelper, info_box = jq('<div id="info-box"></div>'), people, price, tax = 3.5;
+var jq = jQuery, contribution = 0, sliders_num = 3, max = 2500, sliders = get_sliders(), sliders_num = sliders.length, timeout, time = 0, defaults = new Defaults(), timeout = -100, display_prices = new Array(), hiddens = new Array(), NonnaHelper, info_box = jq('<div id="info-box"></div>'), people, price, commission = 3.5;
 
 jq(function(){
 	if( jq('input[name="donate"]').is('input') ){
@@ -28,7 +28,7 @@ function changeTotalsOnChangePeople()
 		var r;
 		people = jq(this).val();
 		var tt = ( ( parseFloat(price) + parseFloat(contribution) ) * people );
-		r = parseFloat( ( tt / 100 ) * tax );
+		r = parseFloat( ( tt / 100 ) * commission );
 		tt = tt + r; 
 		
 		info_box.text( 'Price €'+parseFloat(price).toFixed(2)+' donation €'+parseFloat(contribution).toFixed(2)+' for ' +people+' people = '+ tt.toFixed(2) +'€'); 
@@ -46,7 +46,7 @@ function nonna_distibutePaymentInit( cont )
 		
 		tt = parseFloat( ( price * people ) );
 		
-		tt = tt + ( tt / 100 ) * tax;
+		tt = tt + ( tt / 100 ) * commission;
 		
 		jq('div.em-booking-buttons').before( distibute_container );
 		
@@ -110,11 +110,11 @@ function nonna_distibutePaymentInit( cont )
 					
 					tt = ( ( parseFloat(price) + parseFloat(contribution) ) * people );
 					
-					tt = tt + ( tt / 100 ) * tax;
+					tt = tt + ( tt / 100 ) * commission;
 					
 					if( validamount( contribution ) )
 					{
-						info_box.text( 'Price €'+parseFloat(price).toFixed(2)+' donation €'+parseFloat(contribution).toFixed(2)+' for ' +people+' people = '+ tt.toFixed(2) +'€'); 
+						info_box.text( 'Price €'+parseFloat( price ).toFixed(2)+' donation €'+parseFloat( contribution ).toFixed(2)+' for ' +people+' people = '+ tt.toFixed(2) +'€'); 
 
 						updatesliders( index );
 					}
