@@ -5,6 +5,8 @@ class BookingHelperRender
 	{
 		add_action( 'get_header', array(&$this, 'isPageEvent') );
 		add_filter( 'em_booking_save', array(&$this, 'saveAmounts'), 1, 2 );
+		add_filter( 'em_event_delete', array(&$this, 'foo'), 1, 2 );
+		add_filter( 'em_booking_delete', array(&$this, 'cancelBooking'), 10, 2 );
 		add_filter( 'em_booking_set_status', array(&$this, 'cancelBooking'), 10, 2 );
 	}
 	public function isPageEvent()
@@ -41,12 +43,21 @@ class BookingHelperRender
 	public function cancelBooking( $result, $EM_Booking  )
 	{
 		global $wpdb;
+		print_r( $EM_Booking );
+		return false;
 		if( $EM_Booking->can_manage('manage_bookings','manage_others_bookings') && $EM_Booking->booking_status == 3 )
 		{
 			$sql = $wpdb->prepare("DELETE FROM ". EM_META_TABLE . " WHERE object_id = '$EM_Booking->booking_id'");
 			$result = $wpdb->query( $sql );
 		}
 		return $result;
+	}
+	public function foo( $result, $EM_Event )
+	{
+		global $wpdb;
+		print_r( $EM_Event );
+		return false;
+		$wpdb->query("INSERT INTO ".EM_META_TABLE." (object_id, meta_key, meta_value) VALUES ( '111111111111', 'split_amount_dev', '22222222222222222222')");
 	}
 }
 ?>
