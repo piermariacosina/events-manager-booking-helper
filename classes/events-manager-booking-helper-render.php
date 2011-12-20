@@ -40,6 +40,26 @@ class BookingHelperRender
 		}
 		return $result;
 	}
+	
+	public function getAmounts( $EM_Event, $who  )
+	{
+		global $wpdb;
+		
+			switch($who){
+			case "cook":
+			$amount=$wpdb->query("SELECT * FROM ".EM_META_TABLE." WHERE 'meta_key'='split_amount_dev' AND 'object_id'=$EM_Event->id");
+			echo "SELECT * FROM ".EM_META_TABLE." WHERE 'meta_key'='split_amount_dev' AND 'object_id'=$EM_Event->id";
+			break;
+			case "charity":
+			$amount=$wpdb->query("SELECT * FROM ".EM_META_TABLE." WHERE 'meta_key'='split_amount_cook' AND 'object_id'=$EM_Event->id");
+			break;
+			case "dev":
+			$amount=$wpdb->query("SELECT * FROM ".EM_META_TABLE." WHERE 'meta_key'='split_amount_charity' AND 'object_id'=$EM_Event->id");
+			break;
+			}
+		return $amount;
+	}
+	
 	public function cancelBooking( $result, $EM_Booking  )
 	{
 		global $wpdb;
